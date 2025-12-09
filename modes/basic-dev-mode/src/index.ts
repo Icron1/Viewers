@@ -61,7 +61,7 @@ function modeFactory({ modeConfiguration }) {
       const tools = {
         active: [
           {
-            toolName: toolNames.WindowLevel,
+            toolName: toolNames,
             bindings: [{ mouseButton: Enums.MouseBindings.Primary }],
           },
           {

@@ -22,7 +22,7 @@ function _initToolGroups(toolNames, Enums, toolGroupService, commandsManager, se
   const tools = {
     active: [
       {
-        toolName: toolNames.WindowLevel,
+        toolName: toolNames.StackScroll,
         bindings: [{ mouseButton: Enums.MouseBindings.Primary }],
       },
       {

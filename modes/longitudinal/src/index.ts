@@ -58,7 +58,7 @@ export const modeInstance = {
     // We should not be.
     id,
     routeName: 'viewer',
-    displayName: i18n.t('Modes:Basic Viewer'),
+    displayName: i18n.t('Modes:New Viewer'),
     routes: [
       longitudinalRoute
     ],

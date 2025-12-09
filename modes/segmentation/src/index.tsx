@@ -209,7 +209,8 @@ function modeFactory({ modeConfiguration }) {
                 cornerstone.contourSegmentationPanel,
               ],
               rightPanelResizable: true,
-              // leftPanelClosed: true,
+              leftPanelClosed: true,
+              rightPanelClosed: true,
               viewports: [
                 {
                   namespace: cornerstone.viewport,

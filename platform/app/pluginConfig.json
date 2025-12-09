@@ -65,6 +65,10 @@
     {
       "packageName": "@ohif/extension-ultrasound-pleura-bline",
       "version": "3.0.0"
+    },
+    {
+      "packageName": "camomille-annotator",
+      "version": "0.0.1"
     }
   ],
   "modes": [
@@ -99,6 +103,10 @@
     {
       "packageName": "@ohif/mode-ultrasound-pleura-bline",
       "version": "3.0.0"
+    },
+    {
+      "packageName": "@ohif/mode-camomille",
+      "version": "0.0.1"
     }
   ],
   "public": [

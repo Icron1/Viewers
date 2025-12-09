@@ -1,7 +1,7 @@
 /** @type {AppTypes.Config} */
 window.config = {
   routerBasename: null,
-  showStudyList: true,
+  showStudyList: false,
   extensions: [],
   modes: [],
   // below flag is for performance reasons, but it might not work for all servers
@@ -10,12 +10,16 @@ window.config = {
   showLoadingIndicator: true,
   experimentalStudyBrowserSort: false,
   strictZSpacingForVolumeViewport: true,
-  studyPrefetcher: {
-    enabled: true,
-    displaySetsCount: 2,
-    maxNumPrefetchRequests: 10,
-    order: 'closest',
+  showPatientInfo: 'disabled',
+  investigationalUseDialog: {
+    option: 'never',
   },
+  // studyPrefetcher: {
+  //   enabled: true,
+  //   displaySetsCount: 2,
+  //   maxNumPrefetchRequests: 10,
+  //   order: 'closest',
+  // },
   defaultDataSourceName: 'orthancProxy',
   dataSources: [
     {
