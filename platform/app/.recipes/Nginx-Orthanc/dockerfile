@@ -22,9 +22,11 @@ RUN yarn install --frozen-lockfile
 
 # set QUICK_BUILD to true to make the build faster for dev
 ENV APP_CONFIG=config/docker-nginx-orthanc.js
+ARG PUBLIC_URL="/"
+ENV PUBLIC_URL=$PUBLIC_URL
 
 # Build the application
-RUN yarn run build
+RUN PUBLIC_URL=$PUBLIC_URL yarn run build
 
 # # Stage 2: Bundle the built application into a Docker container which runs NGINX using Alpine Linux
 FROM nginx:alpine
