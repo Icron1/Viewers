@@ -69,6 +69,10 @@
     {
       "packageName": "camomille-annotator",
       "version": "0.0.1"
+    },
+    {
+      "packageName": "venice-annotator",
+      "version": "0.0.1"
     }
   ],
   "modes": [
@@ -106,6 +110,10 @@
     },
     {
       "packageName": "@ohif/mode-camomille",
+      "version": "0.0.1"
+    },
+    {
+      "packageName": "venice",
       "version": "0.0.1"
     }
   ],

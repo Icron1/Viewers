@@ -82,6 +82,9 @@ module.exports = (env, argv) => {
         SRC_DIR,
         path.resolve(__dirname, 'modes/camomille/node_modules'),
         path.resolve(__dirname, 'extensions/camomille-annotator/node_modules'),
+        path.resolve(__dirname, 'modes/venice/node_modules'),
+        path.resolve(__dirname, 'modes/venice/node_modules'),
+        path.resolve(__dirname, 'extensions/venice-annotator/node_modules'),
       ],
     },
     plugins: [
