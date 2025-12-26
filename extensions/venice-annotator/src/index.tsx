@@ -175,7 +175,7 @@ export default {
       if (!annotation) return;
       if (annotation.data?.label == "") return; // Obligation de nommer les ROIs
 
-      console.log('[venice-annotator-extension] Measurement ADDED detected:', annotation);
+      // console.log('[venice-annotator-extension] Measurement ADDED detected:', annotation);
       measurementUIDs.add(annotation.annotationUID);
       const payload: MeasurementAddedOrUpdatedPayload = {
         type: 'ohif-measurement-added',
@@ -205,7 +205,7 @@ export default {
       if (!annotation) return;
       if (annotation.data?.label == "") return; // Obligation de nommer les ROIs
 
-      console.log('[venice-annotator-extension] Measurement UPDATED detected:', annotation);
+      // console.log('[venice-annotator-extension] Measurement UPDATED detected:', annotation);
       measurementUIDs.add(annotation.annotationUID);
       const payload: MeasurementAddedOrUpdatedPayload = {
         type: 'ohif-measurement-updated',
@@ -233,7 +233,7 @@ export default {
       if (!measurementUID) return;
       if (!measurementUIDs.has(measurementUID)) return;
 
-      console.log('[venice-annotator-extension] Measurement REMOVED detected:', measurementUID);
+      // console.log('[venice-annotator-extension] Measurement REMOVED detected:', measurementUID);
       measurementUIDs.delete(measurementUID);
       const payload: MeasurementRemovedPayload = {
         type: 'ohif-measurement-removed',
