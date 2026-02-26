@@ -1,16 +1,27 @@
-// Viewers\modes\camomille\src\index.tsx
+// Viewers/modes/venice/src/index.tsx
+
 import i18n from 'i18next';
 import { id } from './id';
-import { 
-  toolbarButtons, 
+import {
+  toolbarButtons as basicToolbarButtons,
   cornerstone,
   segmentation,
   dicomRT,
   extensionDependencies,
-  ohif
- } from '@ohif/mode-basic';
+  ohif,
+} from '@ohif/mode-basic';
 import initToolGroups from './initToolGroups';
 import { primaryAxialCustom } from './primaryAxialCustom';
+
+const veniceToolbarButtons = basicToolbarButtons.map(btn => {
+  if (btn.id !== 'CircleROI') return btn;
+
+  return {
+    ...btn,
+    commandName: 'setToolActive',
+    commandOptions: { toolName: 'CircleROI' },
+  };
+});
 
 function modeFactory({ modeConfiguration }) {
   return {
@@ -23,15 +34,14 @@ function modeFactory({ modeConfiguration }) {
         measurementService,
         toolbarService,
         toolGroupService,
-        customizationService
+        customizationService,
       } = servicesManager.services;
 
       measurementService.clearMeasurements();
 
-      // Init Default and SR ToolGroups
       initToolGroups(extensionManager, toolGroupService, commandsManager);
 
-      toolbarService.register(toolbarButtons);
+      toolbarService.register(veniceToolbarButtons);
 
       toolbarService.updateSection(toolbarService.sections.primary, [
         'StackScroll',
@@ -84,40 +94,40 @@ function modeFactory({ modeConfiguration }) {
         ['windowLevelMenu']
       );
 
-            customizationService.setCustomizations({
+      customizationService.setCustomizations({
         'ohif.hotkeyBindings': {
           $push: [
             {
               commandName: 'setToolActive',
               commandOptions: { toolName: 'StackScroll' },
               label: 'Activer StackScroll',
-              keys: ['b'],        // B → StackScroll
+              keys: ['b'],
               isEditable: true,
             },
             {
               commandName: 'setToolActive',
               commandOptions: { toolName: 'Length' },
               label: 'Activer la règle (Length)',
-              keys: ['l'],        // L → Length
+              keys: ['l'],
               isEditable: true,
             },
             {
               commandName: 'setToolActive',
               commandOptions: { toolName: 'CircleROI' },
               label: 'Activer la ROI circulaire (CircleROI)',
-              keys: ['c'],        // C → CircleROI
+              keys: ['c'],
               isEditable: true,
             },
             {
               commandName: 'setToolActive',
               commandOptions: { toolName: 'ArrowAnnotate' },
               label: 'Activer la flèche (ArrowAnnotate)',
-              keys: ['a'],        // A → ArrowAnnotate
+              keys: ['a'],
               isEditable: true,
             },
           ],
         },
-      });      
+      });
     },
 
     onModeExit: ({ servicesManager }: withAppTypes) => {
@@ -178,7 +188,7 @@ function modeFactory({ modeConfiguration }) {
     ],
 
     extensions: extensionDependencies,
-    hangingProtocol: ['primaryAxialCustom'], 
+    hangingProtocol: ['primaryAxialCustom'],
     hangingProtocols: [primaryAxialCustom],
     sopClassHandlers: [
       ohif.sopClassHandler,
@@ -197,4 +207,4 @@ const mode = {
 };
 
 export default mode;
-export { initToolGroups, toolbarButtons };
+export { initToolGroups };

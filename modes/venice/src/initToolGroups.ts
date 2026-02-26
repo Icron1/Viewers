@@ -1,3 +1,6 @@
+import * as csTools from '@cornerstonejs/tools';
+import { VeniceCircleROITool } from './tools/VeniceCircleROITool';
+
 const colours = {
   'viewport-0': 'rgb(200, 0, 0)',
   'viewport-1': 'rgb(200, 200, 0)',
@@ -10,6 +13,40 @@ const colorsByOrientation = {
   coronal: 'rgb(0, 200, 0)',
 };
 
+function forceRegisterCircleROIOverride() {
+  const toolsAny = csTools as any;
+  const toolName = 'CircleROI';
+
+  try {
+    toolsAny.removeTool?.(toolName);
+  } catch (e) {
+    console.warn('[VENICE][CircleROI] removeTool failed (ok)', e);
+  }
+
+  try {
+    if (toolsAny.state?.tools?.[toolName]) {
+      delete toolsAny.state.tools[toolName];
+    }
+  } catch (e) {
+    console.warn('[VENICE][CircleROI] delete registry entry failed (ok)', e);
+  }
+
+  try {
+    toolsAny.addTool(VeniceCircleROITool);
+  } catch (e) {
+    console.error('[VENICE][CircleROI] addTool(VeniceCircleROITool) failed', e);
+  }
+
+  try {
+    const registered = toolsAny.state?.tools?.[toolName];
+    console.log(
+      '[VENICE][CircleROI] registered class =',
+      registered?.toolClass?.name || registered?.name || registered
+    );
+  } catch { }
+}
+
+
 function initDefaultToolGroup(extensionManager, toolGroupService, commandsManager, toolGroupId) {
   const utilityModule = extensionManager.getModuleEntry(
     '@ohif/extension-cornerstone.utilityModule.tools'
@@ -19,39 +56,28 @@ function initDefaultToolGroup(extensionManager, toolGroupService, commandsManage
 
   const tools = {
     active: [
-      // 1. StackScroll : Clic Gauche OU Molette (Scroll)
       {
         toolName: toolNames.StackScroll,
         bindings: [
-          { mouseButton: Enums.MouseBindings.Primary }, // Clic Gauche simple
-          { mouseButton: Enums.MouseBindings.Wheel },   // Scroll de la molette
+          { mouseButton: Enums.MouseBindings.Primary },
+          { mouseButton: Enums.MouseBindings.Wheel },
         ],
       },
-      // 2. Zoom : Clic Droit
       {
         toolName: toolNames.Zoom,
-        bindings: [
-          { mouseButton: Enums.MouseBindings.Secondary },
-        ],
+        bindings: [{ mouseButton: Enums.MouseBindings.Secondary }],
       },
-      // 3. WindowLevel : Clic du milieu
       {
         toolName: toolNames.WindowLevel,
         bindings: [
           { mouseButton: Enums.MouseBindings.Auxiliary },
-          { mouseButton: Enums.MouseBindings.Primary, 
-            modifierKey: Enums.KeyboardBindings.Ctrl
-          },
+          { mouseButton: Enums.MouseBindings.Primary, modifierKey: Enums.KeyboardBindings.Ctrl },
         ],
       },
-      // 4. Pan : SHIFT + Clic Gauche
       {
         toolName: toolNames.Pan,
         bindings: [
-          { 
-            mouseButton: Enums.MouseBindings.Primary, 
-            modifierKey: Enums.KeyboardBindings.Shift
-          }, 
+          { mouseButton: Enums.MouseBindings.Primary, modifierKey: Enums.KeyboardBindings.Shift },
         ],
       },
     ],
@@ -61,17 +87,10 @@ function initDefaultToolGroup(extensionManager, toolGroupService, commandsManage
         toolName: toolNames.ArrowAnnotate,
         configuration: {
           getTextCallback: (callback, eventDetails) => {
-            commandsManager.runCommand('arrowTextCallback', {
-              callback,
-              eventDetails,
-            });
+            commandsManager.runCommand('arrowTextCallback', { callback, eventDetails });
           },
           changeTextCallback: (data, eventDetails, callback) => {
-            commandsManager.runCommand('arrowTextCallback', {
-              callback,
-              data,
-              eventDetails,
-            });
+            commandsManager.runCommand('arrowTextCallback', { callback, data, eventDetails });
           },
         },
       },
@@ -86,21 +105,16 @@ function initDefaultToolGroup(extensionManager, toolGroupService, commandsManage
       { toolName: toolNames.PlanarFreehandROI },
       { toolName: toolNames.SplineROI },
       { toolName: toolNames.LivewireContour },
-      { toolName: toolNames.WindowLevelRegion }
+      { toolName: toolNames.WindowLevelRegion },
     ],
     enabled: [
       { toolName: toolNames.ImageOverlayViewer },
       { toolName: toolNames.ReferenceLines },
     ],
-    disabled: [
-      {
-        toolName: toolNames.AdvancedMagnify,
-      },
-    ],
+    disabled: [{ toolName: toolNames.AdvancedMagnify }],
   };
 
   const updatedTools = commandsManager.run('initializeSegmentLabelTool', { tools });
-
   toolGroupService.createToolGroupAndAddTools(toolGroupId, updatedTools);
 }
 
@@ -108,10 +122,7 @@ function initSRToolGroup(extensionManager, toolGroupService) {
   const SRUtilityModule = extensionManager.getModuleEntry(
     '@ohif/extension-cornerstone-dicom-sr.utilityModule.tools'
   );
-
-  if (!SRUtilityModule) {
-    return;
-  }
+  if (!SRUtilityModule) return;
 
   const CS3DUtilityModule = extensionManager.getModuleEntry(
     '@ohif/extension-cornerstone.utilityModule.tools'
@@ -119,32 +130,14 @@ function initSRToolGroup(extensionManager, toolGroupService) {
 
   const { toolNames: SRToolNames } = SRUtilityModule.exports;
   const { toolNames, Enums } = CS3DUtilityModule.exports;
+
   const tools = {
     active: [
-      {
-        toolName: toolNames.WindowLevel,
-        bindings: [
-          {
-            mouseButton: Enums.MouseBindings.Primary,
-          },
-        ],
-      },
-      {
-        toolName: toolNames.Pan,
-        bindings: [
-          {
-            mouseButton: Enums.MouseBindings.Auxiliary,
-          },
-        ],
-      },
+      { toolName: toolNames.WindowLevel, bindings: [{ mouseButton: Enums.MouseBindings.Primary }] },
+      { toolName: toolNames.Pan, bindings: [{ mouseButton: Enums.MouseBindings.Auxiliary }] },
       {
         toolName: toolNames.Zoom,
-        bindings: [
-          {
-            mouseButton: Enums.MouseBindings.Secondary,
-          },
-          { numTouchPoints: 2 },
-        ],
+        bindings: [{ mouseButton: Enums.MouseBindings.Secondary }, { numTouchPoints: 2 }],
       },
       {
         toolName: toolNames.StackScroll,
@@ -161,16 +154,10 @@ function initSRToolGroup(extensionManager, toolGroupService) {
       { toolName: SRToolNames.SRRectangleROI },
       { toolName: toolNames.WindowLevelRegion },
     ],
-    enabled: [
-      {
-        toolName: SRToolNames.DICOMSRDisplay,
-      },
-    ],
-    // disabled
+    enabled: [{ toolName: SRToolNames.DICOMSRDisplay }],
   };
 
-  const toolGroupId = 'SRToolGroup';
-  toolGroupService.createToolGroupAndAddTools(toolGroupId, tools);
+  toolGroupService.createToolGroupAndAddTools('SRToolGroup', tools);
 }
 
 function initMPRToolGroup(extensionManager, toolGroupService, commandsManager) {
@@ -185,39 +172,25 @@ function initMPRToolGroup(extensionManager, toolGroupService, commandsManager) {
 
   const tools = {
     active: [
-      // 1. StackScroll : Clic Gauche OU Molette (Scroll)
       {
         toolName: toolNames.StackScroll,
         bindings: [
-          { mouseButton: Enums.MouseBindings.Primary }, // Clic Gauche simple
-          { mouseButton: Enums.MouseBindings.Wheel },   // Scroll de la molette
+          { mouseButton: Enums.MouseBindings.Primary },
+          { mouseButton: Enums.MouseBindings.Wheel },
         ],
       },
-      // 2. Zoom : Clic Droit
-      {
-        toolName: toolNames.Zoom,
-        bindings: [
-          { mouseButton: Enums.MouseBindings.Secondary },
-        ],
-      },
-      // 3. WindowLevel : Clic du milieu
+      { toolName: toolNames.Zoom, bindings: [{ mouseButton: Enums.MouseBindings.Secondary }] },
       {
         toolName: toolNames.WindowLevel,
         bindings: [
           { mouseButton: Enums.MouseBindings.Auxiliary },
-          { mouseButton: Enums.MouseBindings.Primary, 
-            modifierKey: Enums.KeyboardBindings.Ctrl
-          },
+          { mouseButton: Enums.MouseBindings.Primary, modifierKey: Enums.KeyboardBindings.Ctrl },
         ],
       },
-      // 4. Pan : SHIFT + Clic Gauche
       {
         toolName: toolNames.Pan,
         bindings: [
-          { 
-            mouseButton: Enums.MouseBindings.Primary, 
-            modifierKey: Enums.KeyboardBindings.Shift
-          }, 
+          { mouseButton: Enums.MouseBindings.Primary, modifierKey: Enums.KeyboardBindings.Shift },
         ],
       },
     ],
@@ -227,17 +200,10 @@ function initMPRToolGroup(extensionManager, toolGroupService, commandsManager) {
         toolName: toolNames.ArrowAnnotate,
         configuration: {
           getTextCallback: (callback, eventDetails) => {
-            commandsManager.runCommand('arrowTextCallback', {
-              callback,
-              eventDetails,
-            });
+            commandsManager.runCommand('arrowTextCallback', { callback, eventDetails });
           },
           changeTextCallback: (data, eventDetails, callback) => {
-            commandsManager.runCommand('arrowTextCallback', {
-              callback,
-              data,
-              eventDetails,
-            });
+            commandsManager.runCommand('arrowTextCallback', { callback, data, eventDetails });
           },
         },
       },
@@ -255,9 +221,7 @@ function initMPRToolGroup(extensionManager, toolGroupService, commandsManager) {
       { toolName: toolNames.WindowLevelRegion },
       {
         toolName: toolNames.PlanarFreehandContourSegmentation,
-        configuration: {
-          displayOnePointAsCrosshairs: true,
-        },
+        configuration: { displayOnePointAsCrosshairs: true },
       },
     ],
     disabled: [
@@ -265,29 +229,16 @@ function initMPRToolGroup(extensionManager, toolGroupService, commandsManager) {
         toolName: toolNames.Crosshairs,
         configuration: {
           viewportIndicators: true,
-          viewportIndicatorsConfig: {
-            circleRadius: 5,
-            xOffset: 0.95,
-            yOffset: 0.05,
-          },
+          viewportIndicatorsConfig: { circleRadius: 5, xOffset: 0.95, yOffset: 0.05 },
           disableOnPassive: true,
-          autoPan: {
-            enabled: false,
-            panSize: 10,
-          },
+          autoPan: { enabled: false, panSize: 10 },
           getReferenceLineColor: viewportId => {
             const viewportInfo = cornerstoneViewportService.getViewportInfo(viewportId);
             const viewportOptions = viewportInfo?.viewportOptions;
             if (viewportOptions) {
-              return (
-                colours[viewportOptions.id] ||
-                colorsByOrientation[viewportOptions.orientation] ||
-                '#0c0'
-              );
-            } else {
-              console.warn('missing viewport?', viewportId);
-              return '#0c0';
+              return colours[viewportOptions.id] || colorsByOrientation[viewportOptions.orientation] || '#0c0';
             }
+            return '#0c0';
           },
         },
       },
@@ -299,28 +250,17 @@ function initMPRToolGroup(extensionManager, toolGroupService, commandsManager) {
   toolGroupService.createToolGroupAndAddTools('mpr', tools);
 }
 
-
 function initVolume3DToolGroup(extensionManager, toolGroupService) {
   const utilityModule = extensionManager.getModuleEntry(
     '@ohif/extension-cornerstone.utilityModule.tools'
   );
-
   const { toolNames, Enums } = utilityModule.exports;
 
   const tools = {
     active: [
-      {
-        toolName: toolNames.TrackballRotateTool,
-        bindings: [{ mouseButton: Enums.MouseBindings.Primary }],
-      },
-      {
-        toolName: toolNames.Zoom,
-        bindings: [{ mouseButton: Enums.MouseBindings.Secondary }, { numTouchPoints: 2 }],
-      },
-      {
-        toolName: toolNames.Pan,
-        bindings: [{ mouseButton: Enums.MouseBindings.Auxiliary }, { numTouchPoints: 3 }],
-      },
+      { toolName: toolNames.TrackballRotateTool, bindings: [{ mouseButton: Enums.MouseBindings.Primary }] },
+      { toolName: toolNames.Zoom, bindings: [{ mouseButton: Enums.MouseBindings.Secondary }, { numTouchPoints: 2 }] },
+      { toolName: toolNames.Pan, bindings: [{ mouseButton: Enums.MouseBindings.Auxiliary }, { numTouchPoints: 3 }] },
     ],
   };
 
@@ -328,6 +268,8 @@ function initVolume3DToolGroup(extensionManager, toolGroupService) {
 }
 
 function initToolGroups(extensionManager, toolGroupService, commandsManager) {
+  forceRegisterCircleROIOverride();
+
   initDefaultToolGroup(extensionManager, toolGroupService, commandsManager, 'default');
   initSRToolGroup(extensionManager, toolGroupService);
   initMPRToolGroup(extensionManager, toolGroupService, commandsManager);
